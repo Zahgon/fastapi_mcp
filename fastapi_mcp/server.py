@@ -393,35 +393,7 @@ class FastApiMCP:
         There is no requirement that the FastAPI app or APIRouter is the same as the one that the MCP
         server was created from.
         """
-        # Normalize mount path
-        if not mount_path.startswith("/"):
-            mount_path = f"/{mount_path}"
-        if mount_path.endswith("/"):
-            mount_path = mount_path[:-1]
-
-        if not router:
-            router = self.fastapi
-
-        # Build the base path correctly for the SSE transport
-        assert isinstance(router, (FastAPI, APIRouter)), f"Invalid router type: {type(router)}"
-        base_path = mount_path if isinstance(router, FastAPI) else router.prefix + mount_path
-        messages_path = f"{base_path}/messages/"
-
-        sse_transport = FastApiSseTransport(messages_path)
-        dependencies = self._auth_config.dependencies if self._auth_config else None
-
-        self._register_mcp_endpoints_sse(router, sse_transport, mount_path, dependencies)
-        self._setup_auth()
-
-        # HACK: If we got a router and not a FastAPI instance, we need to re-include the router so that
-        # FastAPI will pick up the new routes we added. The problem with this approach is that we assume
-        # that the router is a sub-router of self.fastapi, which may not always be the case.
-        #
-        # TODO: Find a better way to do this.
-        if isinstance(router, APIRouter):
-            self.fastapi.include_router(router)
-
-        logger.info(f"MCP SSE server listening at {mount_path}")
+        pass
 
     def mount(
         self,
@@ -465,21 +437,7 @@ class FastApiMCP:
         There is no requirement that the FastAPI app or APIRouter is the same as the one that the MCP
         server was created from.
         """
-        import warnings
-
-        warnings.warn(
-            "mount() is deprecated and will be removed in a future version. "
-            "Use mount_http() for HTTP transport (recommended) or mount_sse() for SSE transport instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        if transport == "sse":
-            self.mount_sse(router, mount_path)
-        else:  # pragma: no cover
-            raise ValueError(  # pragma: no cover
-                f"Unsupported transport: {transport}. Use mount_sse() or mount_http() instead."
-            )
+        pass
 
     async def _execute_api_tool(
         self,

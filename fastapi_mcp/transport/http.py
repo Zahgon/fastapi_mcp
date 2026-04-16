@@ -127,10 +127,4 @@ class FastApiHttpSessionManager:
 
     async def shutdown(self) -> None:
         """Clean up the session manager and background task."""
-        if self._manager_task and not self._manager_task.done():
-            self._manager_task.cancel()
-            try:
-                await self._manager_task
-            except asyncio.CancelledError:
-                pass
-        self._manager_started = False
+        pass
